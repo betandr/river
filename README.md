@@ -41,7 +41,7 @@ convolutional neural network. Saves model in `model` directory.
 python3 train.py
 ```
 
-![Cost History Plot](https://github.com/betandr/watson/blob/master/images/cost_history.png)
+![Cost History Plot](https://github.com/betandr/whatson/blob/master/images/cost_history.png)
 
 ## Deactivating Tensorflow
 
