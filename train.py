@@ -4,13 +4,28 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import time
+import argparse
+import os
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--epochs', type=int, default=2000)
+parser.add_argument('--sample', type=int, default=100)
+parser.add_argument('--batch', type=int, default=50)
+parser.add_argument('--plot', dest='plot', action='store_true')
+parser.set_defaults(plot=False)
+args = parser.parse_args()
+
+training_epochs = args.epochs
+sample_size = args.sample
+plot_cost = args.plot
+batch_size = args.batch
+dimensions = 784
+model_dir = 'model'
+
+if not os.path.exists(model_dir):
+    os.makedirs(model_dir)
 
 sess = tf.InteractiveSession()
-
-training_epochs = 2000
-sample_size = 1
-batch_size = 50
-dimensions = 784
 
 def weight_variable(shape):
    initial = tf.truncated_normal(shape, stddev=0.1)
@@ -98,8 +113,7 @@ train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-
-print("running training for " + str(training_epochs) + " epochs")
+print("running training: epochs[" + str(training_epochs) + "] batch[" + str(batch_size) + "] sample[" + str(sample_size) + "]")
 start = int(round(time.time() * 1000))
 sess.run(tf.global_variables_initializer())
 loss_history = np.empty(shape=[1], dtype=float)
@@ -109,16 +123,25 @@ for i in range(training_epochs):
   batch_x = training_features[offset:(offset + batch_size)]
   batch_y = training_labels[offset:(offset + batch_size)]
 
-  if i%100 == 0:
-    print("epoch: " + str(i))
-
   if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})
     loss = (1 - train_accuracy)
-    loss_history = np.append(loss_history, loss)
+    print("epoch: " + str(i) + " loss: " + str(loss))
+    if (plot_cost):
+      loss_history = np.append(loss_history, loss)
   train_step.run(feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
+
+v_batch_x = training_features[0:batch_size]
+v_batch_y = training_labels[0:batch_size]
+v_accuracy = accuracy.eval(feed_dict={x:v_batch_x, y_:v_batch_y, keep_prob: 1.0})
+
+print("validation accuracy: ", v_accuracy)
+
+saver = tf.train.Saver()
+saver.save(sess, model_dir + '/whatson')
 
 end = int(round(time.time() * 1000))
 print("completed in " + str((end - start) / 1000) + " seconds")
 
-plot_history(loss_history)
+if (plot_cost):
+  plot_history(loss_history)

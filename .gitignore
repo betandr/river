@@ -94,4 +94,3 @@ ENV/
 # Project
 data/
 model/
-MNIST_data/

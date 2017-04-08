@@ -35,10 +35,15 @@ python3 extract.py --dir=/path/to/audio
 ```
 
 ### 2) Training neural network
-Use training and validation datasets from the `data` directory to train a 
-convolutional neural network. Saves model in `model` directory.
+Use training and validation datasets from the `data` directory to train a convolutional neural network. 
+Saves model in `model` directory. 
+* `epochs` - number of training iterations
+* `batch` - number of examples to supply in each training epoch 
+* `sample` - how often the current cost is returned to the console/stored for plotting (if `--plot` supplied)
+* `plot` - supplied if a cost history graph is required or omitted if not.
+
 ```
-python3 train.py
+python3 train.py --epochs=2000 --batch=50 --sample_size=10 --plot
 ```
 
 ![Cost History Plot](https://github.com/betandr/whatson/blob/master/images/cost_history.png)
