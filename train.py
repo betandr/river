@@ -1,9 +1,14 @@
 import numpy as np
 import tensorflow as tf
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+import time
 
 sess = tf.InteractiveSession()
 
-training_epochs = 20000
+training_epochs = 2000
+sample_size = 1
 batch_size = 50
 dimensions = 784
 
@@ -20,6 +25,12 @@ def conv2d(x, W):
  
 def max_pool_2x2(x):
    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+
+def plot_history(history):
+    figure = plt.figure(figsize=(10, 8))
+    plt.plot(history)
+    plt.axis([0, (training_epochs/sample_size), 0, np.max(history)])
+    plt.show()
 
 # load data
 print("loading training data")
@@ -87,7 +98,11 @@ train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+
+print("running training for " + str(training_epochs) + " epochs")
+start = int(round(time.time() * 1000))
 sess.run(tf.global_variables_initializer())
+loss_history = np.empty(shape=[1], dtype=float)
 
 for i in range(training_epochs):
   offset = (i * batch_size) % (num_training_examples - batch_size)
@@ -95,6 +110,15 @@ for i in range(training_epochs):
   batch_y = training_labels[offset:(offset + batch_size)]
 
   if i%100 == 0:
+    print("epoch: " + str(i))
+
+  if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})
-    print("step %d, training accuracy %g"%(i, train_accuracy))
+    loss = (1 - train_accuracy)
+    loss_history = np.append(loss_history, loss)
   train_step.run(feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
+
+end = int(round(time.time() * 1000))
+print("completed in " + str((end - start) / 1000) + " seconds")
+
+plot_history(loss_history)
