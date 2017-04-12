@@ -94,3 +94,4 @@ ENV/
 # Project
 data/
 model/
+log/

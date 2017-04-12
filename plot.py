@@ -12,12 +12,14 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--type', type=str)
-parser.add_argument('--file', action='append')
+parser.add_argument('--type', type=str, default='spec')
+parser.add_argument('--title', type=str, default='Plot')
+parser.add_argument('--file', action='append', required=True)
 args = parser.parse_args()
 
 files = args.file
 plot_type = args.type
+title = args.title
 
 def load_sound_files(files):
     raw_sounds = []
@@ -29,9 +31,9 @@ def load_sound_files(files):
 def plot_waveform(raw_sounds):
     i = 1
     fig = plotter.figure(figsize=(25, 60))
-    fig.suptitle('Audio Waveforms', fontsize=12)
+    fig.suptitle("Waveform " + title, fontsize=12)
     for f in raw_sounds:
-        plotter.subplot(10, 1, i)
+        plotter.subplot(2, 1, i)
         librosa.display.waveplot(np.array(f), sr=22050)
         i += 1
     plotter.show()
@@ -39,9 +41,9 @@ def plot_waveform(raw_sounds):
 def plot_spectrogram(raw_sounds):
     i = 1
     fig = plotter.figure(figsize=(25, 60))
-    fig.suptitle('Audio Spectrograms', fontsize=12)
+    fig.suptitle("Spectrogram " + title, fontsize=12)
     for sound in raw_sounds:
-        plotter.subplot(10, 1, i)
+        plotter.subplot(2, 1, i)
         specgram(np.array(sound), Fs=22050)
         i += 1
     plotter.show()

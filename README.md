@@ -19,17 +19,22 @@ source ~/tensorflow/bin/activate
 ## Running
 ### 0) Plotting
 ```
-python3 plot.py --type{wave|spec} --file=path/file1.wav --file=path/file2.wav
+python3 plot.py --type{wave|spec} --file=/path/to/file1.wav --file=/path/to/file2.wav
 ```
-![Waveform Plot](https://github.com/betandr/whatson/blob/master/images/waveforms.png)
-_Waveform Plot_
+![Waveform Plot of R&B Track](https://github.com/betandr/whatson/blob/master/images/randb_wave.png)
+_Waveform Plot of R&B Track]_
 
-![Waveform Plot](https://github.com/betandr/whatson/blob/master/images/spectrograms.png)
-_Spectrogram Plot_
+![Spectrogram Plot of R&B Track](https://github.com/betandr/whatson/blob/master/images/randb_spec.png)
+_Spectrogram Plot of R&B Track]_
+
+![Waveform Plot of Speech](https://github.com/betandr/whatson/blob/master/images/speech_wave.png)
+_Waveform Plot of Speech]_
+
+![Spectrogram Plot of Speech](https://github.com/betandr/whatson/blob/master/images/speech_spec.png)
+_Spectrogram Plot of Speech]_
 
 ### 1) Audio Analysis
-Extract features found in `train` and `valid` subdirectories. Creates 
-training and validation datasets in the `data` directory
+Extract features found in `train` and `valid` subdirectories. Creates training and validation datasets in the `data` directory
 ```
 python3 extract.py --dir=/path/to/audio
 ```
@@ -45,8 +50,18 @@ Saves model in `model` directory.
 ```
 python3 train.py --epochs=2000 --batch=50 --sample_size=10 --plot
 ```
+Logs during training will be created in the `log` subdirectory, these can be visualised with [TensorBoard](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tensorboard/README.md)
 
-![Cost History Plot](https://github.com/betandr/whatson/blob/master/images/cost_history.png)
+## Evaluating
+
+Run TensorBoard:
+```
+tensorboard --logdir=log/
+```
+
+View results at `http://localhost:6006/`
+
+![Accuracy Plot](https://github.com/betandr/whatson/blob/master/images/accuracy.png)
 
 ## Deactivating Tensorflow
 

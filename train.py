@@ -21,9 +21,13 @@ plot_cost = args.plot
 batch_size = args.batch
 dimensions = 784
 model_dir = 'model'
+log_dir = 'log'
 
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
+
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
 sess = tf.InteractiveSession()
 
@@ -101,7 +105,7 @@ h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 keep_prob = tf.placeholder(tf.float32)
 h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-# readout layer (regression)
+# regression layer
 W_fc2 = weight_variable([1024, num_labels])
 b_fc2 = bias_variable([5])
 
@@ -110,13 +114,20 @@ y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 # train and evaulate model
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+with tf.name_scope('Accuracy'):
+  correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
+  accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+tf.summary.scalar('accuracy', accuracy)
 
 print("running training: epochs[" + str(training_epochs) + "] batch[" + str(batch_size) + "] sample[" + str(sample_size) + "]")
 start = int(round(time.time() * 1000))
 sess.run(tf.global_variables_initializer())
 loss_history = np.empty(shape=[1], dtype=float)
+
+train_writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
+merged = tf.summary.merge_all()
 
 for i in range(training_epochs):
   offset = (i * batch_size) % (num_training_examples - batch_size)
@@ -126,15 +137,16 @@ for i in range(training_epochs):
   if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})
     loss = (1 - train_accuracy)
-    print("epoch: " + str(i) + " loss: " + str(loss))
     if (plot_cost):
       loss_history = np.append(loss_history, loss)
-  train_step.run(feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
+    print("epoch: " + str(i) + " loss: " + str(loss))
+  
+  summary, acc = sess.run([merged, train_step], feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
+  train_writer.add_summary(summary, i)
 
 v_batch_x = training_features[0:batch_size]
 v_batch_y = training_labels[0:batch_size]
 v_accuracy = accuracy.eval(feed_dict={x:v_batch_x, y_:v_batch_y, keep_prob: 1.0})
-
 print("validation accuracy: ", v_accuracy)
 
 saver = tf.train.Saver()
