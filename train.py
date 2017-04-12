@@ -8,10 +8,10 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--epochs', type=int, default=2000)
-parser.add_argument('--sample', type=int, default=100)
-parser.add_argument('--batch', type=int, default=50)
-parser.add_argument('--plot', dest='plot', action='store_true')
+parser.add_argument('--epochs', type=int, default=2000, help='number of training iterations')
+parser.add_argument('--sample', type=int, default=100, help='rate current cost is evaluated')
+parser.add_argument('--batch', type=int, default=50, help='number of examples in each training epoch')
+parser.add_argument('--plot', dest='plot', action='store_true', help='plot cost history graph')
 parser.set_defaults(plot=False)
 args = parser.parse_args()
 
@@ -19,7 +19,7 @@ training_epochs = args.epochs
 sample_size = args.sample
 plot_cost = args.plot
 batch_size = args.batch
-dimensions = 784
+flat_dimension = 10000
 model_dir = 'model'
 log_dir = 'log'
 
@@ -68,37 +68,39 @@ num_labels = len(training_labels[0])
 print("found " + str(num_labels) + " unique labels in dataset")
 
 # graph nodes
-x = tf.placeholder(tf.float32, shape=[None, dimensions])
+x = tf.placeholder(tf.float32, shape=[None, flat_dimension])
 y_ = tf.placeholder(tf.float32, shape=[None, num_labels])
 
-W = tf.Variable(tf.zeros([dimensions, num_labels]))
+W = tf.Variable(tf.zeros([flat_dimension, num_labels]))
 b = tf.Variable(tf.zeros([num_labels]))
 
 y = tf.matmul(x,W) + b
  
-# first convolutional layer
+# first convolutional layer - patch size 5x5, input channel 1, output channel 32
 W_conv1 = weight_variable([5, 5, 1, 32])
 b_conv1 = bias_variable([32])
 
 # apply layer
-x_image = tf.reshape(x, [-1,28,28,1])
+x_image = tf.reshape(x, [-1, 100, 100, 1])
 
-# convolve, add bias, apply ReLU, max pool
+# convolve, add bias, apply ReLU, max pool - reduces image to 50x50
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
-# second convolutional layer
+# second convolutional layer - patch size 5x5, input channel 32, output channel 64
 W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
 
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
 h_pool2 = max_pool_2x2(h_conv2)
 
+# reduced to 25x25
+
 # densely connected layer
-W_fc1 = weight_variable([7 * 7 * 64, 1024])
+W_fc1 = weight_variable([25 * 25 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
-h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+h_pool2_flat = tf.reshape(h_pool2, [-1, 25 * 25 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 # dropout

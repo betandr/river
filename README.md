@@ -45,13 +45,13 @@ _Waveform Plot of Speech_
 ![Spectrogram Plot of Speech](https://github.com/betandr/whatson/blob/master/images/speech_spec.png)
 _Spectrogram Plot of Speech_
 
-### 1) Audio Analysis
+### 1) Encoding
 Extract features found in `train` and `valid` subdirectories. Creates training and validation datasets in the `data` directory
 ```
 python3 extract.py --dir=/path/to/audio
 ```
 
-### 2) Training neural network
+### 2) Training
 Use training and validation datasets from the `data` directory to train a convolutional neural network. 
 Saves model in `model` directory. 
 * `epochs` - number of training iterations
@@ -64,7 +64,7 @@ python3 train.py --epochs=2000 --batch=50 --sample_size=10 --plot
 ```
 Logs during training will be created in the `log` subdirectory, these can be visualised with [TensorBoard](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tensorboard/README.md)
 
-## Evaluating
+## Evaluation
 
 Run TensorBoard:
 ```

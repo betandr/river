@@ -4,9 +4,9 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--src', type=str, required=True)
-parser.add_argument('--stride', type=int, required=True)
-parser.add_argument('--dest', type=str, required=True)
+parser.add_argument('--src', type=str, required=True, help='input directory')
+parser.add_argument('--stride', type=int, required=True, help='distance between samples')
+parser.add_argument('--dest', type=str, required=True, help='output directory')
 args = parser.parse_args()
 
 in_dir = args.src
