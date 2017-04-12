@@ -10,6 +10,18 @@ pip3 install --upgrade tensorflow
 pip3 install --upgrade librosa
 ```
 
+## Creating the Dataset
+
+Whatson analyses audio files in WAVE (.wav) format with filenames like `yyyymmdd-aaaa-bb.wav` where `yyyymmdd` is a date/time, `aaaa` is an integer index, and `bb` is the zero-indexed class number for this audio sample. The only really important part is the class number but the files should be in the format `n-n-n.wav` with the last `n` the class. These should be split into a training and validation set, usually at an 80/20 ratio. This can be done by _sampling_ the files:
+
+### Sampling the files
+
+To sample at an 80/20 split use a stride of 5 which will move ever 5th file to the target directory. This will create an even distribution
+of files for the 20% split—the remainder is 80%.
+```
+python3 sample_files.py --src=/path/to/wav/input/files/ --stride=2000 --dest=/path/to/wav/output/files/
+```
+
 ## Activating Tensorflow
 
 ```
@@ -22,16 +34,16 @@ source ~/tensorflow/bin/activate
 python3 plot.py --type{wave|spec} --file=/path/to/file1.wav --file=/path/to/file2.wav
 ```
 ![Waveform Plot of R&B Track](https://github.com/betandr/whatson/blob/master/images/randb_wave.png)
-_Waveform Plot of R&B Track]_
+_Waveform Plot of R&B Track_
 
 ![Spectrogram Plot of R&B Track](https://github.com/betandr/whatson/blob/master/images/randb_spec.png)
-_Spectrogram Plot of R&B Track]_
+_Spectrogram Plot of R&B Track_
 
 ![Waveform Plot of Speech](https://github.com/betandr/whatson/blob/master/images/speech_wave.png)
-_Waveform Plot of Speech]_
+_Waveform Plot of Speech_
 
 ![Spectrogram Plot of Speech](https://github.com/betandr/whatson/blob/master/images/speech_spec.png)
-_Spectrogram Plot of Speech]_
+_Spectrogram Plot of Speech_
 
 ### 1) Audio Analysis
 Extract features found in `train` and `valid` subdirectories. Creates training and validation datasets in the `data` directory
