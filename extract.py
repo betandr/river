@@ -18,8 +18,7 @@ args = parser.parse_args()
 audio_dir = args.dir
 dest_dir = 'data'
 
-# (4 / 10380) * 10000 = 3.85356455 seconds
-flat_dimension=10000
+flat_dimension=10000 # = 3.85356455 seconds
 num_unique_classes=5
 
 if not os.path.exists(dest_dir):
