@@ -222,9 +222,12 @@ for i in range(training_epochs):
   summary, acc = sess.run([merged, train_step], feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
   train_writer.add_summary(summary, i)
 
-v_batch_x, v_batch_y = get_next_validation_batch(batch_size)
-v_accuracy = accuracy.eval(feed_dict={x:v_batch_x, y_:v_batch_y, keep_prob: 1.0})
-print("validation accuracy: ", v_accuracy)
+# evaulate accuracy with validation set
+v_accuracy = []
+for count in range(0, 6):
+  v_batch_x, v_batch_y = get_next_validation_batch(batch_size)
+  v_accuracy.append(accuracy.eval(feed_dict={x:v_batch_x, y_:v_batch_y, keep_prob: 1.0}))
+print("validation accuracy: ", np.mean(v_accuracy))
 
 saver = tf.train.Saver()
 saver.save(sess, model_dir + '/whatson')
