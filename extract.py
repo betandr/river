@@ -66,8 +66,8 @@ def extract_to_disk(batchname):
 start = int(round(time.time() * 1000))
 
 extract_to_disk('fold1')
-# extract_to_disk('fold2')
-# extract_to_disk('fold3')
+extract_to_disk('fold2')
+extract_to_disk('fold3')
 extract_to_disk('fold4')
 
 end = int(round(time.time() * 1000))

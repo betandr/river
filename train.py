@@ -19,9 +19,11 @@ training_epochs = args.epochs
 sample_size = args.sample
 plot_cost = args.plot
 batch_size = args.batch
+
 flat_dimension = 10000
 model_dir = 'model'
 log_dir = 'log'
+folds = [0, 0, 0, 0]
 
 if not os.path.exists(model_dir):
     os.makedirs(model_dir)
@@ -45,26 +47,99 @@ def conv2d(x, W):
 def max_pool_2x2(x):
    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-def plot_history(history):
-    figure = plt.figure(figsize=(10, 8))
-    plt.plot(history)
-    plt.axis([0, (training_epochs/sample_size), 0, np.max(history)])
-    plt.show()
+def slice(index, features, labels, size):
+    """
+    Slices `size` items from `features` and `labels` from the `index` backwards.
+    For example, index=10, size=2, returns features[8:10], labels[8:10]
+
+    Args:`
+        index (int): The current index
+        features (array): The features
+        labels (array): The labels
+        size (int): The size of slice to return
+
+    Returns:
+        array, array: A tuple containing arrays of (features, labels)
+    """
+    x = max((index - size), 0)
+    y = max(index, 0)
+    batch_x = features[x:y]
+    batch_y = labels[x:y]
+    return batch_x, batch_y
+
+def get_next_training_batch(size):
+  """
+    Returns a batch of training examples from fold1, fold2, or fold3. Batch
+    is of size specified and on a moving window through each fold. When one
+    fold is exhausted it will move onto the next fold. When all are exhausted
+    it will restart with the first fold.
+
+    Args:
+
+    Returns:
+        array, array: A tuple containing arrays of (features, labels)
+    """
+  if ((folds[0] >= 0) and (folds[1] >= 0) and (folds[2] >= 0)):
+    folds[0] = len(fold2_features)
+    folds[1] = len(fold2_features)
+    folds[2] = len(fold3_features)
+
+  if (folds[0] > 0):
+    batch_x, batch_y = slice(folds[0], fold1_features, fold1_labels, size)
+    folds[0] = max(folds[0] - size, 0)
+  elif (folds[1] > 0):
+    batch_x, batch_y = slice(folds[1], fold2_features, fold1_labels, size)
+    folds[1] = max(folds[1] - size, 0)
+  elif (folds[2] > 0):
+    batch_x, batch_y = slice(folds[2], fold1_features, fold1_labels, size)
+    folds[2] = max(folds[2] - size, 0)
+
+  return batch_x, batch_y
+
+def get_next_validation_batch(size):
+  """
+    Returns a batch of validation examples from fold4. Batch is of size specified 
+    and on a moving window through fold4. When the fold is exhausted it will restart.
+
+    Args:
+
+    Returns:
+        array, array: A tuple containing arrays of (features, labels)
+    """
+  if (folds[3] <= 0):
+    folds[3] = len(fold4_features)
+
+  batch_x, batch_y = slice(folds[3], fold4_features, fold4_labels, size)
+  folds[3] = max(folds[3] - size, 0)
+
+  return batch_x, batch_y
 
 # load data
 print("loading training data")
-training_features = np.load(file='data/fold1_features.npy')
-training_labels = np.load(file='data/fold1_labels.npy')
-num_training_examples = len(training_features)
+fold1_features = np.load(file='data/fold1_features.npy')
+fold1_labels = np.load(file='data/fold1_labels.npy')
+folds[0] = len(fold1_features)
+
+fold2_features = np.load(file='data/fold2_features.npy')
+fold2_labels = np.load(file='data/fold2_labels.npy')
+folds[1] = len(fold2_features)
+
+fold3_features = np.load(file='data/fold3_features.npy')
+fold3_labels = np.load(file='data/fold3_labels.npy')
+folds[2] = len(fold3_features)
+
+num_training_examples = folds[0] + folds[1] + folds[2]
 print("training example size: " + str(num_training_examples))
 
 print("loading validation data")
-validation_features = np.load(file='data/fold4_features.npy')
-validation_labels = np.load(file='data/fold4_features.npy')
-num_validation_examples = len(validation_features)
+fold4_features = np.load(file='data/fold4_features.npy')
+fold4_labels = np.load(file='data/fold4_labels.npy')
+folds[3] = len(fold4_features)
+
+num_validation_examples = folds[3]
 print("validation example size: " + str(num_validation_examples))
 
-num_labels = len(training_labels[0])
+num_labels = len(fold1_labels[0])
 print("found " + str(num_labels) + " unique labels in dataset")
 
 # graph nodes
@@ -135,9 +210,7 @@ train_writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
 merged = tf.summary.merge_all()
 
 for i in range(training_epochs):
-  offset = (i * batch_size) % (num_training_examples - batch_size)
-  batch_x = training_features[offset:(offset + batch_size)]
-  batch_y = training_labels[offset:(offset + batch_size)]
+  batch_x, batch_y = get_next_training_batch(batch_size)
 
   if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})
@@ -149,8 +222,7 @@ for i in range(training_epochs):
   summary, acc = sess.run([merged, train_step], feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
   train_writer.add_summary(summary, i)
 
-v_batch_x = training_features[0:batch_size]
-v_batch_y = training_labels[0:batch_size]
+v_batch_x, v_batch_y = get_next_validation_batch(batch_size)
 v_accuracy = accuracy.eval(feed_dict={x:v_batch_x, y_:v_batch_y, keep_prob: 1.0})
 print("validation accuracy: ", v_accuracy)
 
@@ -161,4 +233,7 @@ end = int(round(time.time() * 1000))
 print("completed in " + str((end - start) / 1000) + " seconds")
 
 if (plot_cost):
-  plot_history(loss_history)
+    figure = plt.figure(figsize=(10, 8))
+    plt.plot(loss_history)
+    plt.axis([0, (training_epochs/sample_size), 0, np.max(loss_history)])
+    plt.show()
