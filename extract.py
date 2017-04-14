@@ -18,7 +18,7 @@ args = parser.parse_args()
 audio_dir = args.dir
 dest_dir = 'data'
 
-flat_dimension=10000 # = 3.85356455 seconds
+flat_dimension=10000
 num_unique_classes=5
 
 if not os.path.exists(dest_dir):
@@ -56,19 +56,19 @@ def save_data(filename, labels, features):
     np.save(file="data/" + filename + "_labels", arr=labels)
     np.save(file="data/" + filename + "_features", arr=features)
 
+def extract_to_disk(batchname):
+    print("extracting " + batchname + " features and labels")
+    labels, features = process_files(audio_dir + batchname, flat_dimension)
+    print(batchname + " example size: " + str(len(features)))
+    print(batchname + " feature dimension: " + str(len(features[0])))
+    save_data(batchname, labels, features)
+
 start = int(round(time.time() * 1000))
 
-print("extracting training features and labels")
-training_labels, training_features = process_files(audio_dir + 'train', flat_dimension)
-print("training example size: " + str(len(training_features)))
-print("training feature dimension: " + str(len(training_features[0])))
-save_data('training', training_labels, training_features)
-
-print("extracting validation features and labels")
-validation_labels, validation_features = process_files(audio_dir + 'valid', flat_dimension)
-print("validation example size: " + str(len(validation_features)))
-print("validation feature dimension: " + str(len(training_features[0])))
-save_data('validation', validation_labels, validation_features)
+extract_to_disk('fold1')
+# extract_to_disk('fold2')
+# extract_to_disk('fold3')
+extract_to_disk('fold4')
 
 end = int(round(time.time() * 1000))
 

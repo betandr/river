@@ -53,14 +53,14 @@ def plot_history(history):
 
 # load data
 print("loading training data")
-training_features = np.load(file='data/training_features.npy')
-training_labels = np.load(file='data/training_labels.npy')
+training_features = np.load(file='data/fold1_features.npy')
+training_labels = np.load(file='data/fold1_labels.npy')
 num_training_examples = len(training_features)
 print("training example size: " + str(num_training_examples))
 
 print("loading validation data")
-validation_features = np.load(file='data/validation_features.npy')
-validation_labels = np.load(file='data/validation_features.npy')
+validation_features = np.load(file='data/fold4_features.npy')
+validation_labels = np.load(file='data/fold4_features.npy')
 num_validation_examples = len(validation_features)
 print("validation example size: " + str(num_validation_examples))
 
@@ -104,8 +104,10 @@ h_pool2_flat = tf.reshape(h_pool2, [-1, 25 * 25 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 # dropout
-keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+with tf.name_scope('Dropout'):
+  keep_prob = tf.placeholder(tf.float32)
+  h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+tf.summary.scalar('dropout_keep_probability', keep_prob)
 
 # regression layer
 W_fc2 = weight_variable([1024, num_labels])
@@ -114,13 +116,14 @@ b_fc2 = bias_variable([5])
 y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 # train and evaulate model
-cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+with tf.name_scope('Cross_Entropy'):
+  cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
+  train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+tf.summary.scalar('cross_entropy', cross_entropy)
 
 with tf.name_scope('Accuracy'):
   correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
 tf.summary.scalar('accuracy', accuracy)
 
 print("running training: epochs[" + str(training_epochs) + "] batch[" + str(batch_size) + "] sample[" + str(sample_size) + "]")
