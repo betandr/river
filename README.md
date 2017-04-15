@@ -79,6 +79,10 @@ tensorboard --logdir=log/
 View results at `http://localhost:6006/`
 
 ![Accuracy Plot](https://github.com/betandr/whatson/blob/master/images/accuracy.png)
+_Accuracy_
+
+![Cross Entropy Plot](https://github.com/betandr/whatson/blob/master/images/cross_entropy.png)
+_Cross Entropy_
 
 ## Deactivating Tensorflow
 
