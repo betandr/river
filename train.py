@@ -91,24 +91,6 @@ def get_next_training_batch(size):
 
   return batch_x, batch_y
 
-def get_next_single_batch(size):
-  """
-    Returns a batch of training examples from fold1 only. Batch is of size specified 
-    and on a moving window through fold1. When the fold is exhausted it will restart.
-
-    Args:
-
-    Returns:
-        array, array: A tuple containing arrays of (features, labels)
-    """
-  if (folds[0] <= 0):
-    folds[0] = len(fold1_features)
-
-  batch_x, batch_y = slice(folds[0], fold1_features, fold1_labels, size)
-  folds[0] = max(folds[0] - size, 0)
-
-  return batch_x, batch_y
-
 def get_next_validation_batch(size):
   """
     Returns a batch of validation examples from fold4. Batch is of size specified 
@@ -223,8 +205,7 @@ train_writer = tf.summary.FileWriter(log_dir, graph=tf.get_default_graph())
 merged = tf.summary.merge_all()
 
 for i in range(training_epochs):
-  # batch_x, batch_y = get_next_training_batch(batch_size)
-  batch_x, batch_y = get_next_single_batch(batch_size)
+  batch_x, batch_y = get_next_training_batch(batch_size)
 
   if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})

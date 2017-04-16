@@ -1,5 +1,5 @@
 # Whatson
-**Automated Audio Content Analysis Using Convolutional Deep Neural Networks**
+**_Automated Audio Content Analysis Using Convolutional Deep Neural Networks_**
 
 Whatson is a prototype built as part of my MSc thesis to analyse pre-classified audio samples from radio broadcasts and use this to build a Convolutional Neural Network to predict these classes when presented with further samples from radio broadcasts. This research is to determine if Convolutional Neural Networks are an appropriate method of classifing audio.
 
@@ -61,11 +61,10 @@ Use training and validation datasets from the `data` directory to train a convol
 Saves model in `model` directory. 
 * `epochs` - number of training iterations
 * `batch` - number of examples to supply in each training epoch 
-* `sample` - how often the current cost is returned to the console/stored for plotting (if `--plot` supplied)
-* `plot` - supplied if a cost history graph is required or omitted if not.
+* `sample` - how often the current cost is returned to the console
 
 ```
-python3 train.py --epochs=2000 --batch=50 --sample_size=10 --plot
+python3 train.py --epochs=2000 --batch=50 --sample_size=10
 ```
 Logs during training will be created in the `log` subdirectory, these can be visualised with [TensorBoard](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tensorboard/README.md)
 
@@ -79,10 +78,10 @@ tensorboard --logdir=log/
 View results at `http://localhost:6006/`
 
 ![Accuracy Plot](https://github.com/betandr/whatson/blob/master/images/accuracy.png)
-_Accuracy_
+_Accuracy Plot_
 
 ![Cross Entropy Plot](https://github.com/betandr/whatson/blob/master/images/cross_entropy.png)
-_Cross Entropy_
+_Cross Entropy Plot_
 
 ## Deactivating Tensorflow
 
