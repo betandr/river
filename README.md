@@ -83,8 +83,20 @@ _Accuracy Plot_
 ![Cross Entropy Plot](https://github.com/betandr/whatson/blob/master/images/cross_entropy.png)
 _Cross Entropy Plot_
 
+## Auditioning Audio
+To use the model built during the Training process to classify audio samples:
+```
+python3 audition.py --file=/path/to/filename.wav 
+```
+...which should yield a class prediction with a confidence score. This filename does not have to be in any particular format as it is only used to encode as a feature.
+
 ## Deactivating Tensorflow
 
 ```
 deactivate
 ```
+
+## Notes
+
+To suppress TensofFlow logging, use `tf.sh` to run the Python code.
+

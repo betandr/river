@@ -141,8 +141,8 @@ print("found " + str(num_labels) + " unique labels in dataset")
 x = tf.placeholder(tf.float32, shape=[None, flat_dimension])
 y_ = tf.placeholder(tf.float32, shape=[None, num_labels])
 
-W = tf.Variable(tf.zeros([flat_dimension, num_labels]))
-b = tf.Variable(tf.zeros([num_labels]))
+W = tf.Variable(tf.truncated_normal([flat_dimension, num_labels], stddev=1./22.))
+b = tf.Variable(tf.truncated_normal([num_labels], stddev=1./22.))
 
 y = tf.matmul(x,W) + b
  
