@@ -17,6 +17,20 @@ model_dir = 'model'
 flat_dimension = 10000
 num_labels=5
 
+def human_prediction(pred):
+  if (pred == 0):
+    return "somebody talking"
+  elif (pred == 1):
+    return "some music"
+  elif (pred == 2):
+    return "the news"
+  elif (pred == 3):
+    return "more than one person talking"
+  elif (pred == 4):
+    return "a sting or bumper"
+  else:
+    return "something I don't know"
+
 def decode_prediction(pred):
   index, value = max(enumerate(pred), key=operator.itemgetter(1))
   return index, value
@@ -51,3 +65,5 @@ with tf.Session() as sess:
   prediction, confidence = decode_prediction(classification[0].tolist())
 
   print("prediction: class " + str(prediction) + " with " + str(confidence) + " confidence")
+
+  print("I think this is", human_prediction(prediction))
