@@ -1,4 +1,4 @@
-# Whatson
+# Project River
 **_Automated Audio Content Analysis Using Convolutional Deep Neural Networks_**
 
 Whatson is a prototype built as part of my MSc thesis to analyse pre-classified audio samples from radio broadcasts and use this to build a Convolutional Neural Network to predict these classes when presented with further samples from radio broadcasts. This research is to determine if Convolutional Neural Networks are an appropriate method of classifing audio.
