@@ -64,7 +64,7 @@ Saves model in `model` directory.
 * `sample` - how often the current cost is returned to the console
 
 ```
-python3 train.py --epochs=2000 --batch=50 --sample_size=10
+python3 train.py --epochs=2000 --batch=50 --sample=10
 ```
 Logs during training will be created in the `log` subdirectory, these can be visualised with [TensorBoard](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tensorboard/README.md)
 
