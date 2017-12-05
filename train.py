@@ -31,14 +31,14 @@ sess = tf.InteractiveSession()
 def weight_variable(shape):
    initial = tf.truncated_normal(shape, stddev=0.1)
    return tf.Variable(initial)
- 
+
 def bias_variable(shape):
    initial = tf.constant(0.1, shape=shape)
    return tf.Variable(initial)
- 
+
 def conv2d(x, W):
    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
- 
+
 def max_pool_2x2(x):
    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
@@ -93,7 +93,7 @@ def get_next_training_batch(size):
 
 def get_next_validation_batch(size):
   """
-    Returns a batch of validation examples from fold4. Batch is of size specified 
+    Returns a batch of validation examples from fold4. Batch is of size specified
     and on a moving window through fold4. When the fold is exhausted it will restart.
 
     Args:
@@ -145,7 +145,7 @@ W = tf.Variable(tf.truncated_normal([flat_dimension, num_labels], stddev=1./22.)
 b = tf.Variable(tf.truncated_normal([num_labels], stddev=1./22.))
 
 y = tf.matmul(x,W) + b
- 
+
 # first convolutional layer - patch size 5x5, input channel 1, output channel 32
 W_conv1 = weight_variable([5, 5, 1, 32])
 b_conv1 = bias_variable([32])
@@ -210,7 +210,7 @@ for i in range(training_epochs):
   if i%sample_size == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch_x, y_:batch_y, keep_prob: 1.0})
     print("epoch: " + str(i) + " loss: " + str((1 - train_accuracy)))
-  
+
   summary, acc = sess.run([merged, train_step], feed_dict={x:batch_x, y_:batch_y, keep_prob: 0.5})
   train_writer.add_summary(summary, i)
 
